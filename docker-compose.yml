@@ -1,0 +1,33 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gestion_formation
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+
+  app:
+    build: .
+    container_name: projetsynthese
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
