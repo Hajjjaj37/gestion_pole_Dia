@@ -6,10 +6,12 @@ import com.gestion.demo.model.Formation;
 import com.gestion.demo.model.Role;
 import com.gestion.demo.model.User;
 import com.gestion.demo.model.Classe;
+import com.gestion.demo.model.Salle;
 import com.gestion.demo.repository.FormateurRepository;
 import com.gestion.demo.repository.FormationRepository;
 import com.gestion.demo.repository.UserRepository;
 import com.gestion.demo.repository.ClasseRepository;
+import com.gestion.demo.repository.SalleRepository;
 import com.gestion.demo.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ public class FormateurController {
     private final UserRepository userRepository;
     private final FormationRepository formationRepository;
     private final ClasseRepository classeRepository;
+    private final SalleRepository salleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -97,7 +100,14 @@ public class FormateurController {
             formateur.setPrenom(request.getPrenom());
             formateur.setEmail(request.getEmail());
             formateur.setSpecialite(request.getSpecialite());
-            formateur.setUser(newUser); // Utiliser l'utilisateur sauvegardé
+            formateur.setUser(newUser);
+
+            // Ajouter la salle si un salleId est fourni
+            if (request.getSalleId() != null) {
+                Salle salle = salleRepository.findById(request.getSalleId())
+                    .orElseThrow(() -> new RuntimeException("Salle non trouvée avec l'ID: " + request.getSalleId()));
+                formateur.setSalle(salle);
+            }
 
             // Ajouter les classes si des IDs sont fournis
             if (request.getClasseIds() != null && !request.getClasseIds().isEmpty()) {
@@ -119,6 +129,18 @@ public class FormateurController {
             data.put("prenom", formateur.getPrenom());
             data.put("email", formateur.getEmail());
             data.put("specialite", formateur.getSpecialite());
+            
+            // Ajouter les informations de la salle
+            if (formateur.getSalle() != null) {
+                Map<String, Object> salleData = new HashMap<>();
+                salleData.put("id", formateur.getSalle().getId());
+                salleData.put("nom", formateur.getSalle().getNom());
+                salleData.put("numero", formateur.getSalle().getNumero());
+                salleData.put("description", formateur.getSalle().getDescription());
+                salleData.put("capacite", formateur.getSalle().getCapacite());
+                salleData.put("equipement", formateur.getSalle().getEquipement());
+                data.put("salle", salleData);
+            }
             
             // Ajouter les classes
             List<Map<String, Object>> classesData = new ArrayList<>();
@@ -190,6 +212,18 @@ public class FormateurController {
                 formateurData.put("user", userData);
             }
             
+            // Ajouter les informations de la salle
+            if (formateur.getSalle() != null) {
+                Map<String, Object> salleData = new HashMap<>();
+                salleData.put("id", formateur.getSalle().getId());
+                salleData.put("nom", formateur.getSalle().getNom());
+                salleData.put("numero", formateur.getSalle().getNumero());
+                salleData.put("description", formateur.getSalle().getDescription());
+                salleData.put("capacite", formateur.getSalle().getCapacite());
+                salleData.put("equipement", formateur.getSalle().getEquipement());
+                formateurData.put("salle", salleData);
+            }
+            
             // Ajouter les classes
             List<Map<String, Object>> classesData = new ArrayList<>();
             if (formateur.getClasses() != null) {
@@ -257,6 +291,18 @@ public class FormateurController {
                     formateurData.put("user", userData);
                 }
                 
+                // Ajouter les informations de la salle
+                if (formateur.getSalle() != null) {
+                    Map<String, Object> salleData = new HashMap<>();
+                    salleData.put("id", formateur.getSalle().getId());
+                    salleData.put("nom", formateur.getSalle().getNom());
+                    salleData.put("numero", formateur.getSalle().getNumero());
+                    salleData.put("description", formateur.getSalle().getDescription());
+                    salleData.put("capacite", formateur.getSalle().getCapacite());
+                    salleData.put("equipement", formateur.getSalle().getEquipement());
+                    formateurData.put("salle", salleData);
+                }
+                
                 // Ajouter les classes
                 List<Map<String, Object>> classesData = new ArrayList<>();
                 if (formateur.getClasses() != null) {
@@ -286,9 +332,6 @@ public class FormateurController {
                 formateursData.add(formateurData);
             }
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Formateurs récupérés avec succès");
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Formateurs récupérés avec succès",

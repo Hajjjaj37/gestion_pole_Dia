@@ -55,4 +55,8 @@ public class Formateur {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "salle_id")
+    private Salle salle;
 } 

@@ -20,4 +20,5 @@ public class FormateurRequest {
     private String username;
     private String password;
     private Set<Long> classeIds;
+    private Long salleId;
 } 
