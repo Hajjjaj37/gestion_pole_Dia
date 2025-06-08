@@ -17,4 +17,6 @@ public interface StagiaireRepository extends JpaRepository<Stagiaire, Long> {
     
     @Query("SELECT COUNT(s) FROM Stagiaire s WHERE s.classe.id = :classeId")
     Long countByClasseId(@Param("classeId") Long classeId);
+
+    List<Stagiaire> findByClasse_Id(Long classeId);
 } 

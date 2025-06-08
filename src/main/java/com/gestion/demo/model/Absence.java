@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "absences")
@@ -29,6 +30,9 @@ public class Absence {
     private LocalDate dateAbsence;
 
     private String motif; // optionnel : raison de l'absence
+
+    @OneToMany(mappedBy = "absence", cascade = CascadeType.ALL)
+    private List<AbsenceCertificat> absenceCertificats;
 
     // Getters & Setters
     public Long getId() { return id; }

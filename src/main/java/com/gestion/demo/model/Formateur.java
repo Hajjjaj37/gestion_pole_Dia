@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +18,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "formateurs")
+@ToString(exclude = {"rapports", "formations", "classes"})
+@EqualsAndHashCode(exclude = {"rapports", "formations", "classes"})
 public class Formateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,12 +37,17 @@ public class Formateur {
     @Column(nullable = false)
     private String specialite;
 
+    @ManyToMany(mappedBy = "formateurs", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonIgnoreProperties("formateurs")
+    private Set<Rapport> rapports = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
         name = "formation_formateur",
         joinColumns = @JoinColumn(name = "formateur_id"),
         inverseJoinColumns = @JoinColumn(name = "formation_id")
     )
+    @JsonIgnoreProperties("formateurs")
     private Set<Formation> formations = new HashSet<>();
 
     @ManyToMany
@@ -48,15 +56,16 @@ public class Formateur {
         joinColumns = @JoinColumn(name = "formateur_id"),
         inverseJoinColumns = @JoinColumn(name = "classe_id")
     )
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @JsonIgnoreProperties("formateurs")
     private Set<Classe> classes = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties("formateur")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "salle_id")
+    @JsonIgnoreProperties("formateurs")
     private Salle salle;
 } 
