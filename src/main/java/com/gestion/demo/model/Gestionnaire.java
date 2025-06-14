@@ -5,6 +5,7 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "gestionnaires")
@@ -32,10 +33,20 @@ public class Gestionnaire {
     @Column(nullable = false)
     private String role;
 
-    @ManyToMany(mappedBy = "gestionnaires")
+    @OneToMany(mappedBy = "gestionnaire", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "gestionnaire-pubs")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Pub> pubs = new HashSet<>();
+
+    @OneToMany(mappedBy = "gestionnaire", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Reunion> reunions = new HashSet<>();
 
-    @OneToMany(mappedBy = "gestionnaire")
+    @OneToMany(mappedBy = "gestionnaire", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Attestation> attestations = new HashSet<>();
 
     @OneToOne

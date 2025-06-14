@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.HashSet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
+import java.util.Date;
 
 @Entity
 @Table(name = "reunions")
@@ -18,6 +19,15 @@ public class Reunion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String titre;
+    private String description;
+    private Date dateDebut;
+    private Date dateFin;
+
+    @ManyToOne
+    @JoinColumn(name = "gestionnaire_id")
+    private Gestionnaire gestionnaire;
 
     private String sujet;
 

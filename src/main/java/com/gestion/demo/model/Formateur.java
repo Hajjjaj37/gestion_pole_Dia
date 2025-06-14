@@ -68,4 +68,25 @@ public class Formateur {
     @JoinColumn(name = "salle_id")
     @JsonIgnoreProperties("formateurs")
     private Salle salle;
+
+    @OneToMany(mappedBy = "formateur", cascade = CascadeType.ALL)
+    private Set<Evaluation> evaluations = new HashSet<>();
+
+    public Set<Evaluation> getEvaluations() {
+        return evaluations;
+    }
+
+    public void setEvaluations(Set<Evaluation> evaluations) {
+        this.evaluations = evaluations;
+    }
+
+    public void addEvaluation(Evaluation evaluation) {
+        evaluations.add(evaluation);
+        evaluation.setFormateur(this);
+    }
+
+    public void removeEvaluation(Evaluation evaluation) {
+        evaluations.remove(evaluation);
+        evaluation.setFormateur(null);
+    }
 } 

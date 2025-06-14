@@ -9,4 +9,5 @@ import java.util.List;
 public interface AttestationRepository extends JpaRepository<Attestation, Long> {
     List<Attestation> findByStagiaireId(Long stagiaireId);
     List<Attestation> findByGestionnaireId(Long gestionnaireId);
+    List<Attestation> findByStagiaire_Classe_Id(Long classeId);
 } 

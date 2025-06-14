@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.gestion.demo.dto.AttestationDTO;
+
 @RestController
 @RequestMapping("/api/attestations")
 @RequiredArgsConstructor
@@ -200,6 +202,69 @@ public class AttestationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "Erreur lors de la création des attestations: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/classe/{classeId}")
+    public ResponseEntity<?> getAttestationsByClasse(@PathVariable Long classeId) {
+        try {
+            // Récupération des attestations pour la classe
+            List<Attestation> attestations = attestationRepository.findByStagiaire_Classe_Id(classeId);
+            
+            if (attestations.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                    "message", "Aucune attestation trouvée pour cette classe",
+                    "attestations", new ArrayList<>(),
+                    "total", 0
+                ));
+            }
+
+            // Transformation des attestations en DTO avec les informations des stagiaires
+            List<Map<String, Object>> attestationsResponse = attestations.stream()
+                .map(attestation -> {
+                    Map<String, Object> attestationMap = new HashMap<>();
+                    attestationMap.put("id", attestation.getId());
+                    attestationMap.put("titre", attestation.getTitre());
+                    attestationMap.put("contenu", attestation.getContenu());
+                    attestationMap.put("dateEmission", attestation.getDateEmission());
+                    attestationMap.put("dateExpiration", attestation.getDateExpiration());
+                    attestationMap.put("statut", attestation.getStatut());
+
+                    // Informations du stagiaire
+                    if (attestation.getStagiaire() != null) {
+                        Map<String, Object> stagiaireInfo = new HashMap<>();
+                        stagiaireInfo.put("id", attestation.getStagiaire().getId());
+                        stagiaireInfo.put("nom", attestation.getStagiaire().getNom());
+                        stagiaireInfo.put("prenom", attestation.getStagiaire().getPrenom());
+                        stagiaireInfo.put("email", attestation.getStagiaire().getEmail());
+                        attestationMap.put("stagiaire", stagiaireInfo);
+                    }
+
+                    // Informations du gestionnaire
+                    if (attestation.getGestionnaire() != null) {
+                        Map<String, Object> gestionnaireInfo = new HashMap<>();
+                        gestionnaireInfo.put("id", attestation.getGestionnaire().getId());
+                        gestionnaireInfo.put("nom", attestation.getGestionnaire().getNom());
+                        gestionnaireInfo.put("prenom", attestation.getGestionnaire().getPrenom());
+                        gestionnaireInfo.put("email", attestation.getGestionnaire().getEmail());
+                        attestationMap.put("gestionnaire", gestionnaireInfo);
+                    }
+
+                    return attestationMap;
+                })
+                .collect(Collectors.toList());
+
+            // Construction de la réponse
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Attestations récupérées avec succès");
+            response.put("attestations", attestationsResponse);
+            response.put("total", attestationsResponse.size());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Erreur lors de la récupération des attestations: " + e.getMessage()));
         }
     }
 } 

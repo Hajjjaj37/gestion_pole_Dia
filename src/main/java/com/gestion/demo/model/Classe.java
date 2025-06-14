@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,11 +42,17 @@ public class Classe {
 
     @ManyToOne
     @JoinColumn(name = "formation_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Formation formation;
 
     @ManyToMany(mappedBy = "classes")
+    @JsonBackReference(value = "pub-classes")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    private Set<Pub> pubs = new HashSet<>();
+
+    @ManyToMany(mappedBy = "classes")
     private Set<Formateur> formateurs = new HashSet<>();
 
     @OneToMany(mappedBy = "classe", cascade = CascadeType.ALL)
